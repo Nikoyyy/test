@@ -1,7 +1,5 @@
-from openai import OpenAI
 import re
 import time
-import deepl
 import os
 
 """
@@ -22,11 +20,12 @@ is_translate = False
 
 if is_translate:
     if is_deepl:
+        import deepl
         # 初始化 Deepl
         auth_key = os.getenv("DEEPL_AUTH_KEY")
         translator = deepl.Translator(auth_key)
-
     else:
+        from openai import OpenAI
         # 初始化 OpenAI 客户端
         client = OpenAI()
         """gpt-3.5-turbo     gpt-3.5-turbo-1106   gpt-3.5-turbo-0125 """
