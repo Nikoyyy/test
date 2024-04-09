@@ -51,7 +51,7 @@ with open('input.txt', 'r', encoding='utf-8') as file:
 #sentences = re.split(r'(?<=[.。!！?？>]["“”])|(?<=[.。!！?？>])', content)
 #print(sentences)
     
-regex_pattern = r'[.。!！?？>]\*["“”]|[.。!！?？>]\*|[.。!！?？>]["“”]|[.。!！?？>]'
+regex_pattern = r'[.。!！?？>]\*+["“”]|[.。!！?？>]\*+|[.。!！?？>]["“”]|[.。!！?？>]'
 sentences = split_text_by_regex(content, regex_pattern)
 
 # 调整正则表达式以匹配紧邻的以星号(*)开头的单词作为一个词组
