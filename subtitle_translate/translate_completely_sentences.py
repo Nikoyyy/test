@@ -189,7 +189,7 @@ if not os.path.exists(output_directory):
     os.makedirs(output_directory)
 
 # 请将以下函数调用替换为您的SRT文件路径和输出文件路径
-process_srt_file(f'{srt_files_without_extension[0]}.srt', f'output/{srt_files_without_extension[0]}.srt', f'output/optimise_{srt_files_without_extension[0]}.txt')
+process_srt_file(f'{srt_files_without_extension[0]}.srt', f'output/optimise_{srt_files_without_extension[0]}.srt', f'output/optimise_{srt_files_without_extension[0]}.txt')
 """
 https://chat.openai.com/g/g-cKXjWStaE-python/c/cbc275b1-6a28-4188-8b9f-b2d8f369378d
 """
