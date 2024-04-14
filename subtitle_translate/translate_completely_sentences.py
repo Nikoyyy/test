@@ -173,8 +173,23 @@ def process_srt_file(input_file_path, output_file_path, output_file_path2):
 
 
 append_to_log_file("",True)
+
+# 获取当前目录
+current_directory = os.getcwd()
+
+# 列出当前目录下的所有文件
+files = os.listdir(current_directory)
+# 过滤出.srt文件，并去除文件后缀
+srt_files_without_extension = [os.path.splitext(file)[0] for file in files if file.endswith('.srt')]
+
+
+output_directory = os.path.join(current_directory, "output")
+# 如果output目录不存在，则创建它
+if not os.path.exists(output_directory):
+    os.makedirs(output_directory)
+
 # 请将以下函数调用替换为您的SRT文件路径和输出文件路径
-process_srt_file('input.srt', 'output.srt', 'output.txt')
+process_srt_file(f'{srt_files_without_extension[0]}.srt', f'output/{srt_files_without_extension[0]}.srt', f'output/{srt_files_without_extension[0]}.txt')
 """
 https://chat.openai.com/g/g-cKXjWStaE-python/c/cbc275b1-6a28-4188-8b9f-b2d8f369378d
 """
