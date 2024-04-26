@@ -39,7 +39,8 @@ def append_to_log_file(text, first_call=False):
     # 检查是否为第一次调用，如果是，则清空文件内容
     mode = 'w' if first_call else 'a'
     
-    with open("log.log", mode, encoding='utf-8') as file:
+    #with open("log.log", mode, encoding='utf-8') as file:
+    with open(r"D:\Desktop\python_work\github\test\subtitle_translate\log.log", mode, encoding='utf-8') as file:
         file.write(text + "\n")
 
 def translate_text_by_deepl(text, target_language='zh'):
@@ -95,12 +96,61 @@ def translate_text_by_openai(text):
 def is_sentence_complete(text):
     # 这是一个简化的例子，实际应用中可能需要更复杂的逻辑来判断句子是否完整
     # 例如，检查是否以句号、问号或感叹号等结尾
-    return text.strip().endswith(('。', '.', '!','！', '?','？', '；', ';'))
+    return text.strip().endswith(('。”','。','......','...','."','.”', '.', '!”','!"','!','！”','！','?”','?"', '?','？”','？',';”','；”', '；',';"', ';'))
 
+"""
 def split_sentences(text):
     # 使用正则表达式分割句子，保留句末标点
     sentences = [sentence.strip() for sentence in re.split(r'(?<=[。.!！?？;；])', text) if sentence.strip()]
+    for sentence in sentences:
+        append_to_log_file("split:" + sentence)
     return sentences
+"""
+
+
+def split_sentences(text):
+    # 预定义分隔符列表
+    delimiters = ['。”','。','......','...','."','.”', '.', '!”','!"','!','！”','！','?”','?"', '?','？”','？',';”','；”', '；',';"', ';']
+    # 初始化变量
+    sentences = []
+    current_sentence = ''
+    i = 0
+    
+    # 遍历文本中的每个字符
+    while i < len(text):
+        current_sentence += text[i]
+        
+        # 检查当前位置之后的字符是否匹配任何分隔符
+        match = False  # 标记是否找到分隔符
+        for delimiter in delimiters:
+            delimiter_length = len(delimiter)
+            if text[i+1:i+1+delimiter_length] == delimiter:
+                append_to_log_file("delimiter=="+delimiter)
+                # 找到分隔符，将其加到当前句子
+                current_sentence += delimiter
+                append_to_log_file("cur=="+current_sentence)
+                sentences.append(current_sentence.strip())
+                append_to_log_file("strip=="+current_sentence + "\n")
+                current_sentence = ''
+                i += delimiter_length  # 跳过分隔符长度
+                i += 1  # 每个句子之间都有一个空格 ' '
+                match = True
+                break
+        if not match:
+            i += 1
+    
+    # 检查最后一个句子是否已添加
+    if current_sentence:
+        if current_sentence != ' ':
+            sentences.append(current_sentence.strip())
+    
+    if 1:
+        for sentence in sentences:
+            append_to_log_file("split:" + sentence)
+    return sentences
+
+
+
 
 def process_srt_file(input_file_path, output_file_path, output_file_path2):
     with open(input_file_path, 'r', encoding='utf-8') as f:
@@ -182,14 +232,15 @@ files = os.listdir(current_directory)
 # 过滤出.srt文件，并去除文件后缀
 srt_files_without_extension = [os.path.splitext(file)[0] for file in files if file.endswith('.srt')]
 
-
+"""
 output_directory = os.path.join(current_directory, "output")
 # 如果output目录不存在，则创建它
 if not os.path.exists(output_directory):
     os.makedirs(output_directory)
+"""
 
 # 请将以下函数调用替换为您的SRT文件路径和输出文件路径
-process_srt_file(f'{srt_files_without_extension[0]}.srt', f'output/optimise_{srt_files_without_extension[0]}.srt', f'output/optimise_{srt_files_without_extension[0]}.txt')
+process_srt_file(f'{srt_files_without_extension[0]}.srt', f'opt_{srt_files_without_extension[0]}.srt', f'ts_{srt_files_without_extension[0]}.txt')
 """
 https://chat.openai.com/g/g-cKXjWStaE-python/c/cbc275b1-6a28-4188-8b9f-b2d8f369378d
 """
