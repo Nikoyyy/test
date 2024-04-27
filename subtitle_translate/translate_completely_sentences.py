@@ -45,7 +45,16 @@ def append_to_log_file(text, first_call=False):
         file.write(text + "\n")
 
 def translate_text_by_deepl(text, target_language='zh'):
-    result = translator.translate_text(text, target_lang="ZH")
+    result = None
+    retry_count = 0
+    while result is None :
+        try:
+            result = translator.translate_text(text, target_lang="ZH")
+        except Exception as e:
+            print(f"Exception: {e}")
+            print(f"API 调用失败，正在进行第 {retry_count + 1} 次重试...")
+            retry_count += 1
+            time.sleep(1)  # 简单的延时，避免过快重试
     print(result.text)
     return result.text
 
