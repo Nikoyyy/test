@@ -1,6 +1,7 @@
 import re
 import time
 import os
+import sys
 
 """
 deelp:
@@ -240,7 +241,19 @@ if not os.path.exists(output_directory):
 """
 
 # 请将以下函数调用替换为您的SRT文件路径和输出文件路径
-process_srt_file(f'{srt_files_without_extension[0]}.srt', f'opt_{srt_files_without_extension[0]}.srt', f'ts_{srt_files_without_extension[0]}.txt')
+#process_srt_file(f'{srt_files_without_extension[0]}.srt', f'opt_{srt_files_without_extension[0]}.srt', f'ts_{srt_files_without_extension[0]}.txt')
+
+
+def main():
+    if len(sys.argv) > 1:  # 检查是否传递了参数
+        for arg in sys.argv[1:]:  # 遍历除了脚本名之外的所有参数
+            print(f"Received argument: {arg}")
+            process_srt_file(f'{arg}.srt', f'opt_{arg}.srt', f'ts_{arg}.txt')
+
+if __name__ == "__main__":
+    main()
+
+
 """
 https://chat.openai.com/g/g-cKXjWStaE-python/c/cbc275b1-6a28-4188-8b9f-b2d8f369378d
 """
