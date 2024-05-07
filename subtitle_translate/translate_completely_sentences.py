@@ -17,7 +17,11 @@ print(result.text)  # "Bonjour, le monde !"
 
 # if deelp    else openai
 is_deepl = True
-is_translate = False
+
+if sys.argv[2] == "1":
+    is_translate = True
+elif sys.argv[2] == "0":
+    is_translate = False
 
 if is_translate:
     if is_deepl:
@@ -162,17 +166,28 @@ def split_sentences(text):
 
 
 
-def process_srt_file(input_file_path, output_file_path, output_file_path2):
-    with open(input_file_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
+def process_srt_file(input_file_path, opt_file, ts_file, opt_tr_file = None, only_translation = None):
+    with open(input_file_path, 'r', encoding='utf-8') as f_opt:
+        lines = f_opt.readlines()
 
     block_number = 1
     start_time = ''
     end_time = ''
     accumulated_text = ''
 
-    with open(output_file_path, 'w', encoding='utf-8') as f,\
-         open(output_file_path2, 'w', encoding='utf-8') as f2:
+    f_opt = None
+    f_ts = None
+    f_opt_tr = None
+    f_tr = None
+    ts_translation = ""
+
+    f_opt = open(opt_file, 'w', encoding='utf-8')
+    f_ts = open(ts_file, 'w', encoding='utf-8')
+    if is_translate:
+        f_opt_tr = open(opt_tr_file, 'w', encoding='utf-8')
+        f_tr = open(only_translation, 'w', encoding='utf-8')
+
+    try:
         for i, line in enumerate(lines):
             if line.strip().isdigit():
                 continue  # 跳过序号行
@@ -189,18 +204,33 @@ def process_srt_file(input_file_path, output_file_path, output_file_path2):
                             translated_sentences = [translate_text_by_deepl(sentence) for sentence in sentences]
                         else:
                             translated_sentences = [translate_text_by_openai(sentence) for sentence in sentences]
+
                     else:
                         translated_sentences = ""
-                    f.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
+
+                    f_opt.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
+                    if is_translate:
+                        f_opt_tr.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
+                        f_tr.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
+
                     for original in sentences:
-                        f.write(f"{original}\n")
-                        f2.write(f"{original} ")
+                        f_opt.write(f"{original}\n")
+                        f_ts.write(f"{original} ")
+
+                        if is_translate:
+                            f_opt_tr.write(f"{original}\n")
+
                     #f.write("\n")  # 原文与译文之间添加一个空行分隔
                     # 再写入所有翻译文本句子
                     if translated_sentences:
                         for translated in translated_sentences:
-                            f.write(f"{translated}\n")
-                    f.write("\n")
+                            f_opt_tr.write(f"{translated}\n")
+                            f_tr.write(f"{translated}\n")
+                            ts_translation = ts_translation + translated + ' '
+                    f_opt.write("\n")
+                    if is_translate:
+                        f_opt_tr.write("\n")
+                        f_tr.write("\n")
                     block_number += 1
                     start_time = ''
                     accumulated_text = ''
@@ -218,17 +248,37 @@ def process_srt_file(input_file_path, output_file_path, output_file_path2):
                     translated_sentences = [translate_text_by_openai(sentence) for sentence in sentences]
             else:
                 translated_sentences = ""
-            f.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
+            f_opt.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
+            if is_translate:
+                f_opt_tr.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
+                f_tr.write(f"{block_number}\n{start_time} --> {end_time.strip()}\n")
             for original in sentences:
-                f.write(f"{original}\n")
+                f_opt.write(f"{original}\n")
+                f_ts.write(f"{original} ")
+                if is_translate:
+                    f_opt_tr.write(f"{original}\n")
             #f.write("\n")  # 原文与译文之间添加一个空行分隔
             # 再写入所有翻译文本句子
             if translated_sentences:
                 for translated in translated_sentences:
-                    f.write(f"{translated}\n")
-            f.write("\n")
-
-    print(f"字幕文件已生成：{output_file_path}")
+                    f_opt_tr.write(f"{translated}\n")
+                    f_tr.write(f"{translated}\n")
+                    ts_translation = ts_translation + translated + ' '
+            f_opt.write("\n")
+            if is_translate:
+                f_opt_tr.write("\n")
+                f_tr.write("\n")
+    finally:
+        # 确保所有文件都在最后被关闭
+        f_opt.close()
+        if is_translate:
+            f_ts.write(f"\n{ts_translation} ")
+        f_ts.close()
+        if is_translate:
+            f_opt_tr.close()
+            f_tr.close()
+        
+    print(f"字幕文件已生成：{opt_file}")
 
 
 
@@ -255,9 +305,17 @@ if not os.path.exists(output_directory):
 
 def main():
     if len(sys.argv) > 1:  # 检查是否传递了参数
-        for arg in sys.argv[1:]:  # 遍历除了脚本名之外的所有参数
-            print(f"Received argument: {arg}")
-            process_srt_file(f'{arg}.srt', f'opt_{arg}.srt', f'ts_{arg}.txt')
+        #for arg in sys.argv[1:]:  # 遍历除了脚本名之外的所有参数
+
+        print(f"Received argument: {sys.argv[1]}  {sys.argv[2]}")
+        global is_deepl
+        global is_translate
+
+        if sys.argv[2] == "1":
+            process_srt_file(f'{sys.argv[1]}.srt', f'opt_{sys.argv[1]}.srt', f'ts_{sys.argv[1]}.txt', f'opt_tr_{sys.argv[1]}.srt', f'translation_{sys.argv[1]}.srt')
+        elif sys.argv[2] == "0":
+            process_srt_file(f'{sys.argv[1]}.srt', f'opt_{sys.argv[1]}.srt', f'ts_{sys.argv[1]}.txt')
+
 
 if __name__ == "__main__":
     main()
