@@ -308,8 +308,6 @@ def main():
         #for arg in sys.argv[1:]:  # 遍历除了脚本名之外的所有参数
 
         print(f"Received argument: {sys.argv[1]}  {sys.argv[2]}")
-        global is_deepl
-        global is_translate
 
         if sys.argv[2] == "1":
             process_srt_file(f'{sys.argv[1]}.srt', f'opt_{sys.argv[1]}.srt', f'ts_{sys.argv[1]}.txt', f'opt_tr_{sys.argv[1]}.srt', f'translation_{sys.argv[1]}.srt')
